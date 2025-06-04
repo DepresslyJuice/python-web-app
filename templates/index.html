@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Predicción Titanic</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fa;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        form {
+            background: #fff;
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 30px 40px 20px 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        label {
+            display: flex;
+            flex-direction: column;
+            font-weight: bold;
+            color: #34495e;
+        }
+        input, select, button {
+            margin-top: 5px;
+            padding: 8px;
+            border: 1px solid #bfc9d1;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        button {
+            background: #2980b9;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #1c5980;
+        }
+        #resultado {
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 20px;
+            color: #16a085;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Predicción de Supervivencia en el Titanic</h1>
+    <form id="titanic-form">
+        <label>Clase: <input type="number" name="Pclass" min="1" max="3" required></label>
+        <label>Sexo: 
+            <select name="Sex" required>
+                <option value="male">Hombre</option>
+                <option value="female">Mujer</option>
+            </select>
+        </label>
+        <label>Edad: <input type="number" name="Age" step="any" required></label>
+        <label>Hermanos/Pareja a bordo: <input type="number" name="SibSp" required></label>
+        <label>Padres/Hijos a bordo: <input type="number" name="Parch" required></label>
+        <label>Tarifa: <input type="number" name="Fare" step="any" required></label>
+        <label>Puerto de embarque: 
+            <select name="Embarked" required>
+                <option value="C">Cherburgo</option>
+                <option value="Q">Queenstown</option>
+                <option value="S">Southampton</option>
+            </select>
+        </label>
+        <button type="submit">Predecir</button>
+    </form>
+    <div id="resultado"></div>
+    <script>
+        document.getElementById('titanic-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target));
+            for (let key in data) {
+                if (!isNaN(data[key])) data[key] = Number(data[key]);
+            }
+            const res = await fetch('/predict', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            document.getElementById('resultado').innerText = 
+                result.survived === 1 ? "¡Sobreviviría!" : "No sobreviviría.";
+        }
+    </script>
+</body>
+</html>
